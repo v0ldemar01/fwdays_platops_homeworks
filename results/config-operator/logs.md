@@ -1,5 +1,5 @@
 ## Step 1.5. Start a local Kubernetes cluster
-
+```
 $ kind create cluster --name kubebuilder-demo
 
 Creating cluster "kubebuilder-demo" ...
@@ -15,20 +15,18 @@ You can now use your cluster with:
 kubectl cluster-info --context kind-kubebuilder-demo
 
 Thanks for using kind! 😊
-
-## Step
-
-1.6. Verify cluster is running
-
+```
+## Step 1.6. Verify cluster is running
+```
 $ kubectl cluster-info
 
 Kubernetes control plane is running at https://127.0.0.1:55346
 CoreDNS is running at https://127.0.0.1:55346/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
 
 To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
-
+```
 ## Step 2.1: Initialize the Project
-
+```
 $ mkdir config-operator && cd config-operator
 go mod init example.com/config-operator
 kubebuilder init --domain example.com --repo example.com/config-operator
@@ -75,9 +73,9 @@ INFO Update dependencies:
 $ go mod tidy
 Next: define a resource with:
 $ kubebuilder create api
-
+```
 ## Step 2.2: Create API and Controller
-
+```
 $ kubebuilder create api --group apps --version v1 --kind ConfigSync
 
 INFO Create Resource [y/n]
@@ -101,15 +99,15 @@ go: sigs.k8s.io/controller-tools@v0.17.2 requires go >= 1.23.0; switching to go1
 /Users/volodymyrminchenko/My-Education/PlatOps/fwdays_platops_homeworks/config-operator/bin/controller-gen object:headerFile="hack/boilerplate.go.txt" paths="./..."
 Next: implement your new API and generate the manifests (e.g. CRDs,CRs) with:
 $ make manifests
-
+```
 ## Step 2.3: Generate CRD Manifests
-
+```
 $ make manifests
 
 /Users/volodymyrminchenko/My-Education/PlatOps/fwdays_platops_homeworks/config-operator/bin/controller-gen rbac:roleName=manager-role crd webhook paths="./..." output:crd:artifacts:config=config/crd/bases
-
+```
 ## Step 5.1: Build the Controller Image
-
+```
 $ make docker-build IMG=config-operator:v1 [10:45:57]
 docker build -t config-operator:v1 .
 [+] Building 52.3s (18/18) FINISHED docker:desktop-linux
@@ -164,15 +162,15 @@ View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux
 
 What's next:
 View a summary of image vulnerabilities and recommendations → docker scout quickview
-
+```
 ## Step 5.3: Deploy the Controller to the Cluster
-
+```
 $ kind load docker-image config-operator:v1 --name kubebuilder-demo [10:48:51]
 Image: "config-operator:v1" with ID "sha256:2d377b25e219ac2c285785d3a692c5d8ac7ee5445e590d75262b4cc5edbec8f9" not yet present on node "kubebuilder-demo-control-plane", loading...
-
+```
 ## Step 5.3: Deploy the Controller to the Cluster
-
-$ make deploy IMG=config-operator:v1 [10:49:44]
+```
+$ make deploy IMG=config-operator:v1
 /Users/volodymyrminchenko/My-Education/PlatOps/fwdays_platops_homeworks/config-operator/bin/controller-gen rbac:roleName=manager-role crd webhook paths="./..." output:crd:artifacts:config=config/crd/bases
 Downloading sigs.k8s.io/kustomize/kustomize/v5@v5.6.0
 go: sigs.k8s.io/kustomize/kustomize/v5@v5.6.0 requires go >= 1.22.7; switching to go1.23.7
@@ -193,15 +191,15 @@ clusterrolebinding.rbac.authorization.k8s.io/config-operator-manager-rolebinding
 clusterrolebinding.rbac.authorization.k8s.io/config-operator-metrics-auth-rolebinding created
 service/config-operator-controller-manager-metrics-service created
 deployment.apps/config-operator-controller-manager created
-
+```
 ## Step 6.2: Apply the Sample Resource
-
+```
 $ kubectl apply -f config/samples/apps_v1_configsync.yaml [10:54:09]
 configsync.apps.example.com/configsync-sample created
-
+```
 ## Step 6.3: Verify the Controller Created the ConfigMap
-
-$ kubectl get configmap my-config -o yaml [10:55:35]
+```
+$ kubectl get configmap my-config -o yaml
 apiVersion: v1
 data:
 app.properties: |
@@ -216,10 +214,10 @@ name: my-config
 namespace: default
 resourceVersion: "2213"
 uid: 6262dfdd-083a-426c-9286-900350e3f485
-
+```
 ## Step 6.4: Check the Status of the ConfigSync Resource
-
-$ kubectl get configsync configsync-sample -o yaml [10:56:00]
+```
+$ kubectl get configsync configsync-sample -o yaml
 apiVersion: apps.example.com/v1
 kind: ConfigSync
 metadata:
@@ -244,14 +242,14 @@ updateInterval: 30
 status:
 lastSyncTime: "2025-03-31T07:56:05Z"
 status: Synced
-
+```
 ## Step 6.5: Update the ConfigSync Resource and Observe the Changes
-
-$ kubectl edit configsync configsync-sample [10:56:24]
+```
+$ kubectl edit configsync configsync-sample
 
 configsync.apps.example.com/configsync-sample edited
 
-$ kubectl get configmap my-config -o yaml [10:57:40]
+$ kubectl get configmap my-config -o yaml
 apiVersion: v1
 data:
 app.properties: |
@@ -266,16 +264,16 @@ name: my-config
 namespace: default
 resourceVersion: "2442"
 uid: 6262dfdd-083a-426c-9286-900350e3f485
-
+```
 ## Step 7.1: Delete the ConfigSync Resource
-
-$ kubectl delete -f config/samples/apps_v1_configsync.yaml [10:59:29]
+```
+$ kubectl delete -f config/samples/apps_v1_configsync.yaml
 
 configsync.apps.example.com "configsync-sample" deleted
-
+```
 ## Step 7.2: Uninstall the Controller
-
-make undeploy [11:01:44]
+```
+make undeploy
 
 /Users/volodymyrminchenko/My-Education/PlatOps/fwdays_platops_homeworks/config-operator/bin/kustomize build config/default | kubectl delete --ignore-not-found=false -f -
 namespace "config-operator-system" deleted
@@ -293,10 +291,11 @@ clusterrolebinding.rbac.authorization.k8s.io "config-operator-manager-rolebindin
 clusterrolebinding.rbac.authorization.k8s.io "config-operator-metrics-auth-rolebinding" deleted
 service "config-operator-controller-manager-metrics-service" deleted
 deployment.apps "config-operator-controller-manager" deleted
-
+```
 ## Step 7.3: Delete the Kubernetes Cluster
-
-$ kind delete cluster --name kubebuilder-demo [11:01:55]
+```
+$ kind delete cluster --name kubebuilder-demo
 
 Deleting cluster "kubebuilder-demo" ...
 Deleted nodes: ["kubebuilder-demo-control-plane"]
+```
