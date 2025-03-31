@@ -22,15 +22,16 @@ Ensure you have the following installed on your system:
 
 #### **1. Install Go**
 ```sh
-# For Linux/macOS
-wget https://go.dev/dl/go1.20.linux-amd64.tar.gz
+# For Linux/macOS - for Apple Silicon it should be
+wget https://go.dev/dl/go1.20.linux-amd64.tar.gz `darwin-arm64` instead of `linux-amd64`
+
 sudo tar -C /usr/local -xzf go1.20.linux-amd64.tar.gz
 export PATH=$PATH:/usr/local/go/bin
 ```
 
 #### **2. Install kubectl**
 ```sh
-# For Linux
+# For Linux/macOS - for Apple Silicon it should be
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
 chmod +x kubectl
 sudo mv kubectl /usr/local/bin/
@@ -38,6 +39,7 @@ sudo mv kubectl /usr/local/bin/
 
 #### **3. Install kind**
 ```sh
+# For Linux/macOS - for Apple Silicon it should be
 curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
 chmod +x ./kind
 sudo mv ./kind /usr/local/bin/kind
@@ -150,11 +152,11 @@ make manifests
 
 ## **Part 4: Implement the Controller**
 
-### **Modify `controllers/configsync_controller.go`**
+### **Modify `controller/configsync_controller.go`**
 Replace the contents with:
 
 ```go
-package controllers
+package controller
 
 import (
 	"context"
@@ -226,13 +228,13 @@ func (r *ConfigSyncReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 
 		if err := r.Create(ctx, configMap); err != nil {
 			log.Error(err, "Failed to create ConfigMap")
-			
+
 			// Update status with error
 			configSync.Status.Status = "Error: Failed to create ConfigMap"
 			if updateErr := r.Status().Update(ctx, configSync); updateErr != nil {
 				log.Error(updateErr, "Failed to update ConfigSync status")
 			}
-			
+
 			return ctrl.Result{}, err
 		}
 
@@ -242,13 +244,13 @@ func (r *ConfigSyncReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		targetConfigMap.Data = configSync.Spec.Data
 		if err := r.Update(ctx, targetConfigMap); err != nil {
 			log.Error(err, "Failed to update ConfigMap")
-			
+
 			// Update status with error
 			configSync.Status.Status = "Error: Failed to update ConfigMap"
 			if updateErr := r.Status().Update(ctx, configSync); updateErr != nil {
 				log.Error(updateErr, "Failed to update ConfigSync status")
 			}
-			
+
 			return ctrl.Result{}, err
 		}
 		log.Info("Updated ConfigMap", "ConfigMap.Name", targetConfigMap.Name)
