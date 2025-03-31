@@ -1,0 +1,13 @@
+apiVersion: apps.example.com/v1
+kind: ConfigSync
+metadata:
+  name: configsync-sample
+spec:
+  configMapName: my-config
+  data:
+    key1: "value1"
+    key2: "value2"
+    app.properties: |
+      app.name=MyApp
+      app.version=1.0.0
+  updateInterval: 30
